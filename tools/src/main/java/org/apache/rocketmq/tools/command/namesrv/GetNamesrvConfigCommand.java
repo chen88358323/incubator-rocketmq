@@ -17,10 +17,8 @@
 
 package org.apache.rocketmq.tools.command.namesrv;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.rocketmq.remoting.RPCHook;

@@ -422,7 +422,23 @@ public class DefaultMQAdminExt extends ClientConfig implements MQAdminExt {
         RemotingConnectException, MQBrokerException {
         return this.defaultMQAdminExtImpl.getAllTopicGroup(brokerAddr, timeoutMillis);
     }
+    /****
+     * 获取broker上的所有producer group
+     * add by cc
+     * **/
+    public List<String> getAllProducerGroupByBroker(final String brokerAddr,
+                                             long timeoutMillis) throws InterruptedException, RemotingTimeoutException, RemotingSendRequestException,
+            RemotingConnectException, MQBrokerException{
+        return this.defaultMQAdminExtImpl.getAllProducerGroupByBroker(brokerAddr,timeoutMillis);
+    }
 
+
+
+    //    @Override
+//    public List<String> getAllProducerGroupByBroker(final String brokerAddr, long timeoutMillis) throws InterruptedException,
+//            RemotingTimeoutException, RemotingSendRequestException, RemotingConnectException, MQBrokerException {
+//        return this.mqClientInstance.getMQClientAPIImpl().getAllTopicConfig(brokerAddr, timeoutMillis);
+//    }
     /* (non-Javadoc)
      * @see org.apache.rocketmq.client.MQAdmin#queryMessageByUniqKey(java.lang.String, java.lang.String)
      */

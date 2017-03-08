@@ -71,7 +71,8 @@ public class GetNamesrvConfigCommandTest {
 
         Map<String, Properties> propertiesMap = new HashMap<>();
         List<String> nameServers = new ArrayList<>();
-        when(mQClientAPIImpl.getNameServerConfig(ArgumentMatchers.<String>anyList(), anyLong())).thenReturn(propertiesMap);
+//        nameServers.add("10.126.84.66:9876");
+//        when(mQClientAPIImpl.getNameServerConfig(ArgumentMatchers.<String>anyList(), anyLong())).thenReturn(propertiesMap);
     }
 
     @AfterClass

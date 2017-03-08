@@ -79,7 +79,7 @@ public interface MQAdminExt extends MQAdmin {
     TopicList fetchAllTopicList() throws RemotingException, MQClientException, InterruptedException;
 
     TopicList fetchTopicsByCLuster(String clusterName) throws RemotingException, MQClientException, InterruptedException;
-
+//todo
     KVTable fetchBrokerRuntimeStats(final String brokerAddr) throws RemotingConnectException, RemotingSendRequestException,
         RemotingTimeoutException, InterruptedException, MQBrokerException;
 
@@ -198,6 +198,15 @@ public interface MQAdminExt extends MQAdmin {
     TopicConfigSerializeWrapper getAllTopicGroup(final String brokerAddr,
         long timeoutMillis) throws InterruptedException, RemotingTimeoutException, RemotingSendRequestException,
         RemotingConnectException, MQBrokerException;
+
+
+    /****
+     * 获取broker上的所有producer group
+     * add by cc
+     * **/
+    List<String> getAllProducerGroupByBroker(final String brokerAddr,
+                                                 long timeoutMillis) throws InterruptedException, RemotingTimeoutException, RemotingSendRequestException,
+            RemotingConnectException, MQBrokerException;
 
     void updateConsumeOffset(String brokerAddr, String consumeGroup, MessageQueue mq,
         long offset) throws RemotingException, InterruptedException, MQBrokerException;

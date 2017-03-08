@@ -886,7 +886,16 @@ public class DefaultMQAdminExtImpl implements MQAdminExt, MQAdminExtInner {
         RemotingTimeoutException, RemotingSendRequestException, RemotingConnectException, MQBrokerException {
         return this.mqClientInstance.getMQClientAPIImpl().getAllTopicConfig(brokerAddr, timeoutMillis);
     }
-
+    /****
+     * 获取broker上的所有producer group
+     * add by cc
+     * **/
+    @Override
+    public List<String> getAllProducerGroupByBroker(final String brokerAddr,
+                                                    long timeoutMillis) throws InterruptedException, RemotingTimeoutException, RemotingSendRequestException,
+            RemotingConnectException, MQBrokerException{
+        return this.mqClientInstance.getMQClientAPIImpl().getAllProducerGroupByBroker(brokerAddr,timeoutMillis);
+    }
     @Override
     public void createTopic(String key, String newTopic, int queueNum) throws MQClientException {
         createTopic(key, newTopic, queueNum, 0);

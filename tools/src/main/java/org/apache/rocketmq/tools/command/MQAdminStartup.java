@@ -75,6 +75,8 @@ public class MQAdminStartup {
     protected static List<SubCommand> subCommandList = new ArrayList<SubCommand>();
 
     public static void main(String[] args) {
+//        //查看列表
+//       args=new String[]{"topicList"," -n 127.0.0.1:9876"};
         main0(args, null);
     }
 

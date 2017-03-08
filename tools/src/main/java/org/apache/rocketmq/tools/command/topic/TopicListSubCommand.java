@@ -16,22 +16,31 @@
  */
 package org.apache.rocketmq.tools.command.topic;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.MixAll;
+import org.apache.rocketmq.common.TopicConfig;
 import org.apache.rocketmq.common.UtilAll;
-import org.apache.rocketmq.common.protocol.body.ClusterInfo;
-import org.apache.rocketmq.common.protocol.body.GroupList;
-import org.apache.rocketmq.common.protocol.body.TopicList;
+import org.apache.rocketmq.common.protocol.body.*;
 import org.apache.rocketmq.common.protocol.route.BrokerData;
 import org.apache.rocketmq.common.protocol.route.TopicRouteData;
+import org.apache.rocketmq.common.subscription.SubscriptionGroupConfig;
 import org.apache.rocketmq.remoting.RPCHook;
+import org.apache.rocketmq.remoting.exception.RemotingConnectException;
 import org.apache.rocketmq.remoting.exception.RemotingException;
+import org.apache.rocketmq.remoting.exception.RemotingSendRequestException;
+import org.apache.rocketmq.remoting.exception.RemotingTimeoutException;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.apache.rocketmq.tools.command.SubCommand;
 
@@ -52,29 +61,84 @@ public class TopicListSubCommand implements SubCommand {
         Option opt = new Option("c", "clusterModel", false, "clusterModel");
         opt.setRequired(false);
         options.addOption(opt);
+
+        //add by cc
+        opt =
+                new Option("p", "productgroup", false,
+                        "getProductGroup, eg: 192.168.0.1:9876;192.168.0.2:9876");
+        opt.setRequired(false);
+        options.addOption(opt);
         return options;
     }
+    //add by cc
+    private List<String> getpProducerGroupList(DefaultMQAdminExt dmqae){
+        try {
+//            SubscriptionGroupWrapper sgw=dmqae.getAllSubscriptionGroup("127.0.0.1:10911",30000);
+//            if(sgw==null||sgw.getSubscriptionGroupTable()==null||sgw.getSubscriptionGroupTable().isEmpty())
+//                return;
+//            TopicConfigSerializeWrapper sgw=dmqae.getAllTopicGroup("127.0.0.1:10911",30000);
+//            List<String> l=new ArrayList<String>();
+//            l.add("127.0.0.1:9876");
+//            dmqae.getNameServerConfig(l);
+//            if(sgw==null||sgw.getTopicConfigTable()==null||sgw.getTopicConfigTable().isEmpty())
+//                return;
+//            ConcurrentHashMap<String, TopicConfig> cmap= sgw.getTopicConfigTable();
+//            for (String k:cmap.keySet() ) {
+//                TopicConfig str = cmap.get(k);//得到每个key多对用value的值
+//            }
 
+
+            List<String> producerGroupList=dmqae.getAllProducerGroupByBroker("127.0.0.1:10911",30000);
+            if(producerGroupList!=null&&producerGroupList.size()>0){
+                for (int i = 0; i <producerGroupList.size() ; i++) {
+                    System.out.println("***********************"+producerGroupList.get(i));
+                }
+            }
+            return  producerGroupList;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (RemotingTimeoutException e) {
+            e.printStackTrace();
+        } catch (RemotingSendRequestException e) {
+            e.printStackTrace();
+        } catch (RemotingConnectException e) {
+            e.printStackTrace();
+        } catch (MQBrokerException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     @Override
     public void execute(final CommandLine commandLine, final Options options, RPCHook rpcHook) {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(rpcHook);
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
 
         try {
+
             defaultMQAdminExt.start();
-            if (commandLine.hasOption('c')) {
+
+            if(commandLine.hasOption('p')){//获取单台broker上的producer group
+
+                List<String> list= getpProducerGroupList (defaultMQAdminExt);
+                if(list!=null||list.size()>0){
+                    for (String pg : list) {
+                        System.out.printf("%s%n", pg);
+                    }
+                }
+            }else if (commandLine.hasOption('c')) {
+
                 ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
 
                 System.out.printf("%-20s  %-48s  %-48s%n",
-                    "#Cluster Name",
-                    "#Topic",
-                    "#Consumer Group"
+                        "#Cluster Name",
+                        "#Topic",
+                        "#Consumer Group"
                 );
 
                 TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
                 for (String topic : topicList.getTopicList()) {
                     if (topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)
-                        || topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)) {
+                            || topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)) {
                         continue;
                     }
 
@@ -83,7 +147,7 @@ public class TopicListSubCommand implements SubCommand {
 
                     try {
                         clusterName =
-                            this.findTopicBelongToWhichCluster(topic, clusterInfo, defaultMQAdminExt);
+                                this.findTopicBelongToWhichCluster(topic, clusterInfo, defaultMQAdminExt);
                         groupList = defaultMQAdminExt.queryTopicConsumeByWho(topic);
                     } catch (Exception e) {
                     }
@@ -95,9 +159,9 @@ public class TopicListSubCommand implements SubCommand {
 
                     for (String group : groupList.getGroupList()) {
                         System.out.printf("%-20s  %-48s  %-48s%n",
-                            UtilAll.frontStringAtLeast(clusterName, 20),
-                            UtilAll.frontStringAtLeast(topic, 48),
-                            UtilAll.frontStringAtLeast(group, 48)
+                                UtilAll.frontStringAtLeast(clusterName, 20),
+                                UtilAll.frontStringAtLeast(topic, 48),
+                                UtilAll.frontStringAtLeast(group, 48)
                         );
                     }
                 }
@@ -115,8 +179,8 @@ public class TopicListSubCommand implements SubCommand {
     }
 
     private String findTopicBelongToWhichCluster(final String topic, final ClusterInfo clusterInfo,
-        final DefaultMQAdminExt defaultMQAdminExt) throws RemotingException, MQClientException,
-        InterruptedException {
+                                                 final DefaultMQAdminExt defaultMQAdminExt) throws RemotingException, MQClientException,
+            InterruptedException {
         TopicRouteData topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
 
         BrokerData brokerData = topicRouteData.getBrokerDatas().get(0);

@@ -51,4 +51,31 @@ public class UpdateTopicSubCommandTest {
         assertThat(commandLine.getOptionValue('u').trim()).isEqualTo("false");
         assertThat(commandLine.getOptionValue('s').trim()).isEqualTo("false");
     }
+
+/***
+ * create toipc by testcase
+ *
+ * **/
+    @Test
+    public void testnewTopic() {
+        UpdateTopicSubCommand cmd = new UpdateTopicSubCommand();
+        Options options = ServerUtil.buildCommandlineOptions(new Options());
+        String[] subargs = new String[] {
+                "-b 127.0.0.1:10911",
+                "-n 127.0.0.1:9876",
+                "-t topic_test"};
+        final CommandLine commandLine =
+                ServerUtil.parseCmdLine("mqadmin " + cmd.commandName(), subargs, cmd.buildCommandlineOptions(options), new PosixParser());
+//        assertThat(commandLine.getOptionValue('b').trim()).isEqualTo("127.0.0.1:10911");
+//        assertThat(commandLine.getOptionValue('c').trim()).isEqualTo("default-cluster");
+//        assertThat(commandLine.getOptionValue('r').trim()).isEqualTo("8");
+//        assertThat(commandLine.getOptionValue('w').trim()).isEqualTo("8");
+//        assertThat(commandLine.getOptionValue('t').trim()).isEqualTo("unit-test");
+//        assertThat(commandLine.getOptionValue('p').trim()).isEqualTo("6");
+//        assertThat(commandLine.getOptionValue('o').trim()).isEqualTo("false");
+//        assertThat(commandLine.getOptionValue('u').trim()).isEqualTo("false");
+//        assertThat(commandLine.getOptionValue('s').trim()).isEqualTo("false");
+
+        cmd.execute(commandLine, options, null);
+    }
 }

@@ -85,7 +85,8 @@ public class ProducerConnectionSubCommandTest {
     public void testExecute() {
         ProducerConnectionSubCommand cmd = new ProducerConnectionSubCommand();
         Options options = ServerUtil.buildCommandlineOptions(new Options());
-        String[] subargs = new String[] {"-g default-producer-group", "-t unit-test"};
+        String[] subargs = new String[] {"-g pg", "-t topic_test"};
+//        sh mqadmin producerConnection -n 127.0.0.1:9876 -g pg -t topic_test
         final CommandLine commandLine =
             ServerUtil.parseCmdLine("mqadmin " + cmd.commandName(), subargs, cmd.buildCommandlineOptions(options), new PosixParser());
         cmd.execute(commandLine, options, null);
